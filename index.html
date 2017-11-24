@@ -9,25 +9,124 @@
             padding: 20px;
             font-size: 20px;
             color: #0051ff;
-            white-space: pre;
+        }
+
+        #clearbutton {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            border: 1px solid #ccc;
+            z-index: 100;
+            padding: 5px;
+        }
+
+        #contentDiv {
+            position: relative;
+            border: 1px solid #ccc;
+            padding-left: 5px;
+        }
+
+        #contentDiv::after {
+            position: absolute;
+            content: '';
+            top: 0;
+            left: 0;
+            height: 20px;
+            width: 4px;
+            background-color: #000;
+        }
+
+        .card {
+            height: auto;
+            width: 50%;
+            border: 1px solid #fa225b;
+            margin-bottom: 10px;
+        }
+
+        .card-header {
+            position: relative;
+            height: 30px;
+            background-color: #f90948;
+            padding: 5px;
+            font-weight: 500;
+        }
+
+        .card-header .icons {
+            position: absolute;
+            right: 0;
+        }
+
+        .card-body {
+            background-color: #fc6d93;
+            min-height: 100px;
+            padding: 5px;
+        }
+
+        .card-body.collapsed {
+            height: 0;
+            min-height: 0;
+            padding: 0;
         }
     </style>
 </head>
-<body contenteditable>
+<body>
+    <div id="contentDiv" contenteditable></div>
+    <div class="card">
+        <div class="card-header">
+            <span contenteditable="true"></span>
+            <span class="icons">
+                <input class="delete" type="image" src="delete.png" />
+                <input class="collapse" type="image" src="up.png" />
+            </span>
+        </div>
+        <div class="card-body" contenteditable="true"></div>
+    </div>
 
+    <div class="card">
+        <div class="card-header">
+            <span contenteditable="true"></span>
+            <span class="icons">
+                <input class="delete" type="image" src="delete.png" />
+                <input class="collapse" type="image" src="up.png" />
+            </span>
+        </div>
+        <div class="card-body" contenteditable="true"></div>
+    </div>
 <script>
     window.onload = function () {
         var bodyElement = document.getElementsByTagName('body')[0];
+        var contentDiv = document.getElementById('contentDiv');
         var localStorageContent = localStorage.getItem('notepad');
-        bodyElement.innerHTML = localStorageContent === null ? "" : localStorageContent;
-        bodyElement.addEventListener('input', function () {
+        
+        contentDiv.innerHTML = localStorageContent === null ? "" : localStorageContent;
+        
+        contentDiv.addEventListener('input', function () {
             setTimeout(function () {
-                localStorage.setItem('notepad', bodyElement.innerHTML);
+                saveToLocalStorage(contentDiv.innerHTML);
             }, 500);
         });
-        console.log(bodyElement.innerHTML);
+        
+        function saveToLocalStorage(value) {
+            localStorage.setItem('notepad', value);
+        }
+        // clear the storage and the div as well
+        var clearbutton = document.getElementById('clearbutton');
+        
+        clearbutton.addEventListener('click', function() {
+            contentDiv.innerHTML = '';
+            saveToLocalStorage('');
+        });
+
+        // collapse the cards
+        bodyElement.addEventListener('click', function(e) {
+            if(e.target.className === 'collapse') {
+                var cardBody = e.target.parentElement.parentElement.nextElementSibling;
+                cardBody.className += ' collapsed';
+            }
+        });
     }
 </script>
+<button id="clearbutton">Clear All</button>
 </body>
 
 </html>
